@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TaskItem from "../TaskItem/TaskItem.jsx";
-import classes from "./TasksList.module.css"
+import classes from "./TasksList.module.css";
 import tasksStore from "../../store/TasksStore.js";
 import { observer } from "mobx-react-lite";
 import { reaction } from "mobx";
@@ -9,6 +9,7 @@ const TasksList = observer(() => {
     const listRef = useRef(null);
     const [openTaskId, setOpenTaskId] = useState(null);
     const [extraPadding, setExtraPadding] = useState(0);
+    const updatePaddingTimerRef = useRef(null);
     const scrollTimerRef = useRef(null);
 
     const updatePadding = () => {
@@ -25,31 +26,31 @@ const TasksList = observer(() => {
     };
 
     useEffect(() => {
-        let timer;
         const disposer = reaction(
             () => tasksStore.tasks.length,
             () => {
-                // Таймер нужен для учета асинхронности обновления DOM дерева, иначе отступ не будет добавляться
-                // при появлении первого элемента, создающего scrollbar, по условию из updatePadding()
-                timer = setTimeout(updatePadding, 50);
+                // При добавлении элементов проверить, нужно ли обновлять отступ справа для учета полосы прокрутки
+                if (updatePaddingTimerRef.current) {
+                    clearTimeout(updatePaddingTimerRef.current);
+                }
+                updatePaddingTimerRef.current = setTimeout(updatePadding, 50);
             }
         );
 
         return () => {
-            clearTimeout(timer);
             disposer();
-        };
-    }, []);
 
-    useEffect(() => {
-        return () => {
+            if (updatePaddingTimerRef.current) {
+                clearTimeout(updatePaddingTimerRef.current);
+            }
             if (scrollTimerRef.current) {
                 clearTimeout(scrollTimerRef.current);
             }
         };
     }, []);
 
-    const scrollOnLastTask = async () => {
+    const scrollOnLastTask = () => {
+        // Очистить старый таймер и запустить таймер для сдвига на последний элемент
         if (scrollTimerRef.current) {
             clearTimeout(scrollTimerRef.current);
         }
@@ -60,8 +61,12 @@ const TasksList = observer(() => {
             }
         }, 50);
 
-        setTimeout(updatePadding, 50);
-    }
+        // Очистить старый таймер и проверить, нужно ли добавить отступ справа для полосы прокрутки
+        if (updatePaddingTimerRef.current) {
+            clearTimeout(updatePaddingTimerRef.current);
+        }
+        updatePaddingTimerRef.current = setTimeout(updatePadding, 50);
+    };
 
     const handleToggleActionsMenu = (taskId) => {
         setOpenTaskId((prevId) => {
@@ -70,8 +75,8 @@ const TasksList = observer(() => {
                 return null;
             }
 
-            // Это сделано для того, чтобы при открытии меню действий у последнего элемента - оно отображалось без
-            // создания ненужной полосы прокрутки
+            // Если открывается меню действий для последнего элемента - списку нужно добавить отступ снизу, чтобы
+            // выделить место для меню действий
             const isLastTask = tasksStore.tasks[tasksStore.tasks.length - 1]?.id === taskId;
             if (isLastTask) {
                 setExtraPadding(50);
