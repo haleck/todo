@@ -1,12 +1,13 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TaskItem from "../TaskItem/TaskItem.jsx";
 import classes from "./TasksList.module.css"
 import tasksStore from "../../store/TasksStore.js";
-import {observer} from "mobx-react-lite";
-import {reaction} from "mobx";
+import { observer } from "mobx-react-lite";
+import { reaction } from "mobx";
 
 const TasksList = observer(() => {
     const listRef = useRef(null);
+    const [openTaskId, setOpenTaskId] = useState(null);
 
     const updatePadding = () => {
         const listElement = listRef.current;
@@ -22,7 +23,7 @@ const TasksList = observer(() => {
     };
 
     useEffect(() => {
-        let timer
+        let timer;
         const disposer = reaction(
             () => tasksStore.tasks.length,
             () => {
@@ -35,8 +36,12 @@ const TasksList = observer(() => {
         return () => {
             clearTimeout(timer);
             disposer();
-        }
+        };
     }, []);
+
+    const handleToggleActionsMenu = (taskId) => {
+        setOpenTaskId((prevId) => (prevId === taskId ? null : taskId));
+    };
 
     return (
         <div ref={listRef} className={classes.todoList}>
@@ -44,6 +49,8 @@ const TasksList = observer(() => {
                 <TaskItem
                     key={task.id}
                     task={task}
+                    isOpen={openTaskId === task.id}
+                    onToggleActionsMenu={handleToggleActionsMenu}
                 />
             )}
         </div>

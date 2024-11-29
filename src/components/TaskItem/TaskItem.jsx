@@ -17,10 +17,9 @@ const MoreSvg = (props) => (
     </svg>
 );
 
-const TaskItem = observer(({task}) => {
+const TaskItem = observer(({ task, isOpen, onToggleActionsMenu }) => {
     const [title, setTitle] = useState(task.title);
     const [completed, setCompleted] = useState(task.completed);
-    const [isActionsVisible, setIsActionsVisible] = useState(false);
 
     const handleCheckboxChange = () => {
         tasksStore.switchTaskCompleted(task.id);
@@ -35,15 +34,11 @@ const TaskItem = observer(({task}) => {
         console.log('Удалить задачу ' + task.id);
     };
 
-    const toggleActionsMenu = () => {
-        setIsActionsVisible((prevState) => !prevState);
-    };
-
     const closeActionsMenu = (event) => {
         if (event.target.closest(`.${classes.actions}`) || event.target.closest(`.${classes.actionsSvg}`)) {
             return;
         }
-        setIsActionsVisible(false);
+        onToggleActionsMenu(null);
     };
 
     React.useEffect(() => {
@@ -73,9 +68,9 @@ const TaskItem = observer(({task}) => {
                 style={{ fill: 'var(--main-color)', marginTop: 4, cursor: 'pointer' }}
                 height={32}
                 className={classes.actionsSvg}
-                onClick={toggleActionsMenu}
+                onClick={() => onToggleActionsMenu(task.id)}
             />
-            {isActionsVisible && (
+            {isOpen && (
                 <div className={classes.actions}>
                     <button onClick={handleDelete}>Удалить</button>
                 </div>
@@ -85,3 +80,4 @@ const TaskItem = observer(({task}) => {
 });
 
 export default TaskItem;
+
