@@ -1,0 +1,11 @@
+.wrapper {
+  background: var(--elements-background-color);
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*# sourceMappingURL=TodoCreator.module.css.map */
