@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import classes from "./AutoResizeTextarea.module.css";
 
-const AutoResizeTextarea = ({text, setText, maxLength, handleEnter, ...props}) => {
+const AutoResizeTextarea = ({text, setText, onBlur, maxLength, handleEnter, ...props}) => {
     const textareaRef = useRef(null);
 
     useEffect(() => {
@@ -16,16 +16,18 @@ const AutoResizeTextarea = ({text, setText, maxLength, handleEnter, ...props}) =
     const handleChange = (e) => {
         const inputText = e.target.value;
         const remainingLength = maxLength - inputText.length;
-        const lastChar = inputText[inputText.length - 1];
 
-        if (lastChar === '\n' && handleEnter) {
-            const trimmedText = inputText.slice(0, -1);
-            setText(trimmedText);
-            handleEnter()
-        } else if (remainingLength >= 0) {
+        if (remainingLength >= 0) {
             setText(inputText);
         } else {
             setText(inputText.slice(0, maxLength));
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && handleEnter) {
+            e.preventDefault();
+            handleEnter(textareaRef);
         }
     };
 
@@ -34,6 +36,8 @@ const AutoResizeTextarea = ({text, setText, maxLength, handleEnter, ...props}) =
             ref={textareaRef}
             value={text}
             onChange={handleChange}
+            onBlur={onBlur}
+            onKeyDown={handleKeyDown}
             className={classes.textarea}
             rows={1}
             {...props}

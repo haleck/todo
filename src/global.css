@@ -4,15 +4,19 @@
     /*colors*/
     --main-color: #3A938D;
     --light-main-color: #5CA49F;
-    --content-background-color: #F8FAFD;
-    --elements-background-color: #F1F1F1;
+    --content-background-color: #F1F1F1;
+    --elements-background-color: white;
     --text-color: #2E3838;
     --disabled-color: rgb(128, 128, 128);
+    --hover-color: #b0b0b0;
+    --focus-color: lightgray;
     --scrollbar-color: rgba(92, 164, 159, 0.8);
 
     /*fonts*/
     --large-font-size: 26px;
     --regular-font-size: 22px;
+    --small-font-size: 18px;
+    --extra-small-font-size: 14px;
 }
 
 body {

@@ -15,6 +15,7 @@
   vertical-align: sub;
   position: relative;
   transition: all 0.2s ease;
+  background-color: var(--elements-background-color);
 }
 .realCheckbox + .customCheckbox::before {
   content: "";
