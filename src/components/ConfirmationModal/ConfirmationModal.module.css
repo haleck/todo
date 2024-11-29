@@ -1,0 +1,53 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modalOverlay .modalContent {
+  background-color: var(--elements-background-color);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+.modalOverlay .modalContent .header {
+  font-weight: 600;
+}
+.modalOverlay .modalContent .modalActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: 20px;
+}
+.modalOverlay .modalContent .modalActions .confirmButton, .modalOverlay .modalContent .modalActions .cancelButton {
+  width: 100%;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.modalOverlay .modalContent .modalActions .confirmButton {
+  background-color: var(--light-main-color);
+  color: #fff;
+  border: none;
+}
+.modalOverlay .modalContent .modalActions .confirmButton:hover {
+  background-color: var(--main-color);
+}
+.modalOverlay .modalContent .modalActions .cancelButton {
+  background-color: #ccc;
+  color: #000;
+  border: none;
+}
+.modalOverlay .modalContent .modalActions .cancelButton:hover {
+  background-color: #b0b0b0;
+}
+
+/*# sourceMappingURL=ConfirmationModal.module.css.map */

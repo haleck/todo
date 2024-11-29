@@ -25,7 +25,7 @@
   justify-content: center;
   gap: 5px;
   font-size: var(--large-font-size);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-color);
 }
 .header > svg {

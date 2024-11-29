@@ -4,6 +4,7 @@ import classes from "./TaskItem.module.css";
 import AutoResizeTextarea from "../../UI/AutoResizeTextarea/AutoResizeTextarea.jsx";
 import tasksStore from "../../store/TasksStore.js";
 import { observer } from "mobx-react-lite";
+import ConfirmationModal from "../ConfirmationModal/ConfirmationModal.jsx";
 
 const completedTaskTextStyle = {
     textDecoration: 'line-through',
@@ -20,6 +21,7 @@ const MoreSvg = (props) => (
 const TaskItem = observer(({ task, isOpen, onToggleActionsMenu }) => {
     const [title, setTitle] = useState(task.title);
     const [completed, setCompleted] = useState(task.completed);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const handleCheckboxChange = () => {
         tasksStore.switchTaskCompleted(task.id);
@@ -31,7 +33,16 @@ const TaskItem = observer(({ task, isOpen, onToggleActionsMenu }) => {
     };
 
     const handleDelete = () => {
-        console.log('Удалить задачу ' + task.id);
+        tasksStore.deleteTask(task.id);
+        setShowConfirmation(false);
+    };
+
+    const handleDeleteClick = () => {
+        setShowConfirmation(true);
+    };
+
+    const handleCancelDelete = () => {
+        setShowConfirmation(false);
     };
 
     const closeActionsMenu = (event) => {
@@ -49,35 +60,46 @@ const TaskItem = observer(({ task, isOpen, onToggleActionsMenu }) => {
     }, []);
 
     return (
-        <div className={classes.wrapper}>
-            <Checkbox
-                checked={completed}
-                onChange={handleCheckboxChange}
-                style={{ marginTop: 4 }}
-            />
-            <AutoResizeTextarea
-                text={title}
-                setText={setTitle}
-                onBlur={changeTaskTitle}
-                handleEnter={(ref) => ref.current.blur()}
-                maxLength={tasksStore.maxTaskTitleLength}
-                style={completed ? completedTaskTextStyle : {}}
-                disabled={completed}
-            />
-            <MoreSvg
-                style={{ fill: 'var(--main-color)', marginTop: 4, cursor: 'pointer' }}
-                height={32}
-                className={classes.actionsSvg}
-                onClick={() => onToggleActionsMenu(task.id)}
-            />
-            {isOpen && (
-                <div className={classes.actions}>
-                    <button onClick={handleDelete}>Удалить</button>
-                </div>
+        <>
+            <div className={classes.wrapper}>
+                <Checkbox
+                    checked={completed}
+                    onChange={handleCheckboxChange}
+                    style={{ marginTop: 4 }}
+                />
+                <AutoResizeTextarea
+                    text={title}
+                    setText={setTitle}
+                    onBlur={changeTaskTitle}
+                    handleEnter={(ref) => ref.current.blur()}
+                    maxLength={tasksStore.maxTaskTitleLength}
+                    style={completed ? completedTaskTextStyle : {}}
+                    disabled={completed}
+                />
+                <MoreSvg
+                    style={{ fill: 'var(--main-color)', marginTop: 4, cursor: 'pointer' }}
+                    height={32}
+                    className={classes.actionsSvg}
+                    onClick={() => onToggleActionsMenu(task.id)}
+                />
+                {isOpen && (
+                    <div className={classes.actions}>
+                        <button onClick={handleDeleteClick}>Удалить</button>
+                    </div>
+                )}
+            </div>
+            {showConfirmation && (
+                <ConfirmationModal
+                    title="Подтверждение удаления"
+                    message={`Вы уверены, что хотите удалить задачу "${title}"?`}
+                    onConfirm={handleDelete}
+                    onCancel={handleCancelDelete}
+                />
             )}
-        </div>
+        </>
     );
 });
 
 export default TaskItem;
+
 
