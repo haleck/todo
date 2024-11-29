@@ -8,6 +8,8 @@ import { reaction } from "mobx";
 const TasksList = observer(() => {
     const listRef = useRef(null);
     const [openTaskId, setOpenTaskId] = useState(null);
+    const [extraPadding, setExtraPadding] = useState(0);
+    const scrollTimerRef = useRef(null);
 
     const updatePadding = () => {
         const listElement = listRef.current;
@@ -39,20 +41,63 @@ const TasksList = observer(() => {
         };
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (scrollTimerRef.current) {
+                clearTimeout(scrollTimerRef.current);
+            }
+        };
+    }, []);
+
+    const scrollOnLastTask = async () => {
+        if (scrollTimerRef.current) {
+            clearTimeout(scrollTimerRef.current);
+        }
+
+        scrollTimerRef.current = setTimeout(() => {
+            if (listRef.current) {
+                listRef.current.scrollTop = listRef.current.scrollHeight;
+            }
+        }, 50);
+
+        setTimeout(updatePadding, 50);
+    }
+
     const handleToggleActionsMenu = (taskId) => {
-        setOpenTaskId((prevId) => (prevId === taskId ? null : taskId));
+        setOpenTaskId((prevId) => {
+            if (prevId === taskId) {
+                setExtraPadding(0);
+                return null;
+            }
+
+            // Это сделано для того, чтобы при открытии меню действий у последнего элемента - оно отображалось без
+            // создания ненужной полосы прокрутки
+            const isLastTask = tasksStore.tasks[tasksStore.tasks.length - 1]?.id === taskId;
+            if (isLastTask) {
+                setExtraPadding(50);
+                scrollOnLastTask()
+            } else {
+                setExtraPadding(0);
+            }
+
+            return taskId;
+        });
     };
 
     return (
-        <div ref={listRef} className={classes.todoList}>
-            {tasksStore.tasks.map((task) =>
+        <div
+            ref={listRef}
+            className={classes.todoList}
+            style={{ paddingBottom: extraPadding }}
+        >
+            {tasksStore.tasks.map((task) => (
                 <TaskItem
                     key={task.id}
                     task={task}
                     isOpen={openTaskId === task.id}
                     onToggleActionsMenu={handleToggleActionsMenu}
                 />
-            )}
+            ))}
         </div>
     );
 });
