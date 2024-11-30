@@ -4,28 +4,26 @@ import classes from "./TasksList.module.css";
 import tasksStore from "../../store/TasksStore.js";
 import { observer } from "mobx-react-lite";
 import { reaction } from "mobx";
+import ErrorSvg from "../../UI/Icons/ErrorSvg.jsx";
+import CycleSvg from "../../UI/Icons/CycleSvg.jsx";
 
 const TasksList = observer(() => {
     const listRef = useRef(null);
     const [openTaskId, setOpenTaskId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false)
     const [extraPadding, setExtraPadding] = useState(0);
     const updatePaddingTimerRef = useRef(null);
     const scrollTimerRef = useRef(null);
 
-    const updatePadding = () => {
-        const listElement = listRef.current;
-        if (listElement) {
-            const hasScrollbar = listElement.scrollHeight > listElement.clientHeight;
-
-            if (hasScrollbar) {
-                listElement.style.paddingRight = '10px';
-            } else {
-                listElement.style.paddingRight = '0';
-            }
-        }
-    };
-
     useEffect(() => {
+        const fetchTasks = async() => {
+            setIsLoading(true)
+            await tasksStore.fetchTasks();
+            setTimeout(()=>setIsLoading(false), 500)
+        }
+
+        fetchTasks()
+
         const disposer = reaction(
             () => tasksStore.tasks.length,
             () => {
@@ -48,6 +46,19 @@ const TasksList = observer(() => {
             }
         };
     }, []);
+
+    const updatePadding = () => {
+        const listElement = listRef.current;
+        if (listElement) {
+            const hasScrollbar = listElement.scrollHeight > listElement.clientHeight;
+
+            if (hasScrollbar) {
+                listElement.style.paddingRight = '10px';
+            } else {
+                listElement.style.paddingRight = '0';
+            }
+        }
+    };
 
     const scrollOnLastTask = () => {
         // Очистить старый таймер и запустить таймер для сдвига на последний элемент
@@ -80,7 +91,7 @@ const TasksList = observer(() => {
             const isLastTask = tasksStore.tasks[tasksStore.tasks.length - 1]?.id === taskId;
             if (isLastTask) {
                 setExtraPadding(50);
-                scrollOnLastTask()
+                scrollOnLastTask();
             } else {
                 setExtraPadding(0);
             }
@@ -95,14 +106,27 @@ const TasksList = observer(() => {
             className={classes.todoList}
             style={{ paddingBottom: extraPadding }}
         >
-            {tasksStore.tasks.map((task) => (
-                <TaskItem
-                    key={task.id}
-                    task={task}
-                    isOpen={openTaskId === task.id}
-                    onToggleActionsMenu={handleToggleActionsMenu}
-                />
-            ))}
+            {isLoading? (
+                <div className={classes.loader}>
+                    <CycleSvg /> <br/>
+                    Получение списка задач...
+                </div>
+            ) : tasksStore.error ? (
+                <div className={classes.error}>
+                    <ErrorSvg /> <br/>
+                    Произошла ошибка <br/>
+                    {tasksStore.error}
+                </div>
+            ) : (
+                tasksStore.tasks.map((task) => (
+                    <TaskItem
+                        key={task.id}
+                        task={task}
+                        isOpen={openTaskId === task.id}
+                        onToggleActionsMenu={handleToggleActionsMenu}
+                    />
+                ))
+            )}
         </div>
     );
 });

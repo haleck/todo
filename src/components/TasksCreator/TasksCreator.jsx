@@ -4,7 +4,7 @@ import AutoResizeTextarea from "../../UI/AutoResizeTextarea/AutoResizeTextarea.j
 import tasksStore from "../../store/TasksStore.js";
 
 const TasksCreator = () => {
-    const [newTask, setNewTask] = useState('')
+    const [newTask, setNewTask] = useState('');
 
     const createTask = () => {
         tasksStore.addTask({
@@ -13,7 +13,7 @@ const TasksCreator = () => {
                 "title": newTask,
                 "completed": false
             })
-        setNewTask('')
+        setNewTask('');
     }
 
     return (

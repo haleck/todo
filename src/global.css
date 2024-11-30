@@ -11,6 +11,7 @@
     --hover-color: #b0b0b0;
     --focus-color: lightgray;
     --scrollbar-color: rgba(92, 164, 159, 0.8);
+    --error-color: tomato;
 
     /*fonts*/
     --large-font-size: 26px;
