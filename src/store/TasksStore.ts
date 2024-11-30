@@ -1,27 +1,35 @@
-import { action, makeAutoObservable, runInAction } from "mobx";
-import axios from "axios";
+import {makeAutoObservable, runInAction} from "mobx";
+import axios, { AxiosResponse } from "axios";
+
+interface Task {
+    id: number;
+    title: string;
+    completed: boolean;
+}
 
 class TasksStore {
-    tasks = [];
-    maxTaskTitleLength = 300;
-    error = null;
+    tasks: Task[] = [];
+    maxTaskTitleLength: number = 300;
+    error: string | null = null;
 
-    _apiUrl = "https://jsonplaceholder.typicode.com/todos/"
+    private _apiUrl: string = "https://jsonplaceholder.typicode.com/todos/";
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    async performRequest(apiCall, successCallback) {
+    private async performRequest<T>(
+        apiCall: () => Promise<AxiosResponse<T>>,
+        successCallback: (response: AxiosResponse<T>) => void
+    ): Promise<void> {
         this.error = null;
 
         try {
             const response = await apiCall();
-
             runInAction(() => {
                 successCallback(response);
             });
-        } catch (error) {
+        } catch (error: any) {
             runInAction(() => {
                 this.error = error.message;
             });
@@ -30,33 +38,33 @@ class TasksStore {
         }
     }
 
-    fetchTasks() {
-        return this.performRequest(
-            () => axios.get(this._apiUrl, { params: { _limit: 10 } }),
+    fetchTasks(): Promise<void> {
+        return this.performRequest<Task[]>(
+            () => axios.get<Task[]>(this._apiUrl, { params: { _limit: 10 } }),
             (response) => {
                 this.tasks = response.data;
             }
         );
     }
 
-    addTask(task) {
-        if (task.title.length === 0) return;
+    addTask(task: Task): Promise<void> {
+        if (task.title.length === 0) return Promise.resolve();
 
         return this.performRequest(
-            () => axios.post(this._apiUrl, task),
+            () => axios.post<Task>(this._apiUrl, task),
             (response) => {
                 this.tasks.push({ ...response.data, id: Date.now() });
             }
         );
     }
 
-    switchTaskCompleted(taskId) {
+    switchTaskCompleted(taskId: number): Promise<void> {
         const task = this.tasks.find((task) => task.id === taskId);
-        if (!task) return;
+        if (!task) return Promise.resolve();
 
         return this.performRequest(
             () =>
-                axios.patch(`${this._apiUrl}${taskId}`, {
+                axios.patch(this._apiUrl + taskId, {
                     completed: !task.completed,
                 }),
             () => {
@@ -65,13 +73,13 @@ class TasksStore {
         );
     }
 
-    changeTaskTitle(taskId, newTitle) {
+    changeTaskTitle(taskId: number, newTitle: string): Promise<void> {
         const task = this.tasks.find((task) => task.id === taskId);
-        if (!task || newTitle.length === 0) return;
+        if (!task || newTitle.length === 0) return Promise.resolve();
 
         return this.performRequest(
             () =>
-                axios.patch(`${this._apiUrl}${taskId}`, {
+                axios.patch(this._apiUrl + taskId, {
                     title: newTitle,
                 }),
             () => {
@@ -80,9 +88,9 @@ class TasksStore {
         );
     }
 
-    deleteTask(taskId) {
+    deleteTask(taskId: number): Promise<void> {
         return this.performRequest(
-            () => axios.delete(`${this._apiUrl}${taskId}`),
+            () => axios.delete(this._apiUrl + taskId),
             () => {
                 this.tasks = this.tasks.filter((task) => task.id !== taskId);
             }

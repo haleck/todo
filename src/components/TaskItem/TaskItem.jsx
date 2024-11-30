@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Checkbox from "../../UI/Checkbox/Checkbox.jsx";
 import classes from "./TaskItem.module.css";
 import AutoResizeTextarea from "../../UI/AutoResizeTextarea/AutoResizeTextarea.jsx";
-import tasksStore from "../../store/TasksStore.js";
+import tasksStore from "../../store/TasksStore.ts";
 import { observer } from "mobx-react-lite";
 import ConfirmationModal from "../ConfirmationModal/ConfirmationModal.jsx";
 import OptionsSvg from "../../UI/Icons/OptionsSvg.jsx";

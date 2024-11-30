@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import classes from "./TasksCreator.module.css"
 import AutoResizeTextarea from "../../UI/AutoResizeTextarea/AutoResizeTextarea.jsx";
-import tasksStore from "../../store/TasksStore.js";
+import tasksStore from "../../store/TasksStore.ts";
 
 const TasksCreator = () => {
     const [newTask, setNewTask] = useState('');

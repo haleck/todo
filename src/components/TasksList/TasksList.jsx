@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import TaskItem from "../TaskItem/TaskItem.jsx";
 import classes from "./TasksList.module.css";
-import tasksStore from "../../store/TasksStore.js";
+import tasksStore from "../../store/TasksStore.ts";
 import { observer } from "mobx-react-lite";
 import { reaction } from "mobx";
 import ErrorSvg from "../../UI/Icons/ErrorSvg.jsx";
