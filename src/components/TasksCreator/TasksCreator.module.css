@@ -1,4 +1,4 @@
-.wrapper {
+.textareaWrapper {
   background: var(--elements-background-color);
   padding: 10px;
   border-radius: 10px;
@@ -7,11 +7,25 @@
   justify-content: center;
   align-items: center;
 }
-.wrapper:focus-within {
+.textareaWrapper:focus-within {
   background-color: var(--focus-color);
 }
-.wrapper:hover {
+.textareaWrapper:hover {
   background-color: var(--focus-color);
+}
+
+.charCounter {
+  padding-right: 8px;
+  padding-top: 5px;
+  text-align: right;
+  font-size: var(--extra-small-font-size);
+  color: var(--text-color);
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.charCounter.visible {
+  opacity: 1;
 }
 
 /*# sourceMappingURL=TasksCreator.module.css.map */

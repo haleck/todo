@@ -5,6 +5,7 @@ import tasksStore from "../../store/TasksStore.js";
 
 const TasksCreator = () => {
     const [newTask, setNewTask] = useState('');
+    const [lengthCounterVisible, setLengthCounterVisible] = useState(false)
 
     const createTask = () => {
         tasksStore.addTask({
@@ -17,15 +18,22 @@ const TasksCreator = () => {
     }
 
     return (
-        <div className={classes.wrapper}>
-            <AutoResizeTextarea
-                text={newTask}
-                setText={setNewTask}
-                maxLength={tasksStore.maxTaskTitleLength}
-                handleEnter={createTask}
-                placeholder={'Новая задача'}
-            />
-        </div>
+        <>
+            <div className={classes.textareaWrapper}>
+                <AutoResizeTextarea
+                    text={newTask}
+                    setText={setNewTask}
+                    maxLength={tasksStore.maxTaskTitleLength}
+                    handleEnter={createTask}
+                    placeholder={'Новая задача'}
+                    onFocus={()=>setLengthCounterVisible(true)}
+                    onBlur={()=>setLengthCounterVisible(false)}
+                />
+            </div>
+            <div className={`${classes.charCounter} ${lengthCounterVisible ? classes.visible : ''}`}>
+                {newTask.length}/{tasksStore.maxTaskTitleLength} символов
+            </div>
+        </>
     );
 };
 
